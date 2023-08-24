@@ -101,7 +101,7 @@ author:
   email            :
   links:
     - label: "CV"
-      icon: "/assets/avatars/approved.png" 
+      icon: "assets/avatars/approved.png" 
       url: "https://drive.google.com/file/d/1OAtg0hS2dywrEZboQQHIqmCnC0VMcypO/view?usp=sharing"
     - label: "Email"
       icon: "fas fa-fw fa-envelope-square"
@@ -283,6 +283,6 @@ defaults:
       layout: single
       author_profile: true
       read_time: true
-      comments: false
-      share: false
-      related: false
+      comments: true
+      share: true
+      related: true
