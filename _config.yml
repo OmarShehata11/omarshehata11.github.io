@@ -16,7 +16,7 @@ minimal_mistakes_skin    : "neon" # "air", "aqua", "contrast", "dark", "dirt", "
 
 # Site Settings
 locale                   : "en-US"
-title                    : "G0ldenR@bbit"
+title                    : "0x1A32_EFE4"
 title_separator          : "-"
 subtitle                 : # site tagline that appears below site title in masthead
 name                     : "Omar Shehata"
@@ -283,6 +283,6 @@ defaults:
       layout: single
       author_profile: true
       read_time: true
-      comments: true
+      comments: false
       share: true
-      related: true
+      related: false
