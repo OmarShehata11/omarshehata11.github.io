@@ -100,7 +100,7 @@ author:
   location         : "Egypt"
   email            :
   links:
-    - label: "CV"
+    - label: "Resume"
       icon: "far fa-id-card" 
       url: "https://drive.google.com/file/d/1OAtg0hS2dywrEZboQQHIqmCnC0VMcypO/view?usp=sharing"
     - label: "Email"
