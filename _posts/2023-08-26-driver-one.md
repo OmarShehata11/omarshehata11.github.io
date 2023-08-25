@@ -11,7 +11,6 @@ toc: true
 ribbon: Green
 ---
 
-
 # Cancel-safe IRP Queue Framework
 
 >  “I never learned from a man who agreed with me.” —Robert A. Heinlein
@@ -24,11 +23,11 @@ Why we need it? a fair enough question to get start into explaining it.
 
 We all know the normal flow of a simple request from ring 3 to ring 0. Some user-mode app or service wants to do some action with the hardware of the computer; so it issue a system call to make the kernel do the job for it. like for example the following image :
 
-[![1](/assets/images/kernelDriver/InvertedCall/1.jpg)]
+[![1](/assets/images/kernelDriver/InvertedCall/1.jpg)](/assets/images/kernelDriver/InvertedCall/1.jpg)
 
 as seen, some user-mode app wants to do some sort of file edit, so it issue a system call (by calling  *WriteFile()* API) so the request goes to kernel and I/O manager creates the IRP with any farther data (like IO_STACK_LOCATION) and gives it to the appropriate driver (which in our case is the file system driver) and when it finish the request, the driver will complete the IRP and return. This image also explains the same but with more details: 
 
-[![1.5](/assets/images/kernelDriver/InvertedCall/1.5.png)]
+[![1.5](/assets/images/kernelDriver/InvertedCall/1.5.png)](/assets/images/kernelDriver/InvertedCall/1.5.png)
 
 But that in one case. So what happen if the driver just not want to complete the IRP at INSTANCE ? they just want to put the request in like a wait list until some sort of event or something happen ? here the Cancel-safe IRP queue framework comes to the stage..
 
@@ -40,7 +39,7 @@ This framework is simply gives you a way to make and manage a wait list for your
 
 Microsoft provides set of routines that **you will implement**, every routine with a specific structure and job to do; but you have just to define the 'way' for it on how to do its job. those are the routines with its main job (from [microsoft documentation](https://learn.microsoft.com/en-us/windows-hardware/drivers/kernel/cancel-safe-irp-queues)):
 
-[![2](/assets/images/kernelDriver/InvertedCall/2.png)]
+[![2](/assets/images/kernelDriver/InvertedCall/2.png)](/assets/images/kernelDriver/InvertedCall/2.png)
 
  How the framework manage those routines? by a structure called **IO_CSQ**. so this structure should be defined and initialized with calling to the function *IoCsqInitialize* or *IoCsqInitializeEx* (choose between them according to which version you used before *CsqInsertIrp* or *CsqInsertIrpEx*). After Implementing those functions you have just to Initialize the **IO_CSQ** with the function mentioned before.
 
@@ -69,13 +68,13 @@ when you implements the framework routines (CsqInsertIrp, CsqPeekNextIrp ..etc) 
 
 for example, if you called ***IoCsqInsertIrpEx***, this function will do so :
 
-[![3](/assets/images/kernelDriver/InvertedCall/3.png)]
+[![3](/assets/images/kernelDriver/InvertedCall/3.png)](/assets/images/kernelDriver/InvertedCall/3.png)
 
 the *xxxCsqAcquireLock* means the routine you have implemented that was called ***CsqAcquireLock*** (you can name it whatever you want when you implements it, the point that you just need to put it in the right parameter when you pass it to *IoCsqInitializeEx* function to initialize the IO_CSQ structure). And also the rest of the macros has a similar way to do its work, this [Documentation](https://learn.microsoft.com/en-us/windows-hardware/drivers/kernel/cancel-safe-irp-queues) explains everything.
 
 After you queued it, the request maker (user-mode app) should know about what you have done; so you should change the status of that queued IRP to be in the pending state until you dequeue it in the way you like. this Image also explains the steps for our case:
 
-[![4.5](/assets/images/kernelDriver/InvertedCall/4.5jpg)]
+[![4.5](/assets/images/kernelDriver/InvertedCall/4.5.jpg)](/assets/images/kernelDriver/InvertedCall/4.5.jpg)
 
 
 
@@ -83,7 +82,7 @@ After you queued it, the request maker (user-mode app) should know about what yo
 
 Now you got the basics idea for the framework. There are ways that make the use of the cancel-safe queue useful, one of it is to serializing the I/O processing in kernel thread. Like this for example :
 
-[![5](/assets/images/kernelDriver/InvertedCall/5.png)]
+[![5](/assets/images/kernelDriver/InvertedCall/5.png)](/assets/images/kernelDriver/InvertedCall/5.png)
 
 Here when the driver accepts the IRP, it queues it. and when the I/O thread is free, it will check if there's any IRP in the queue; if it found one it will dequeue and complete it.
 
