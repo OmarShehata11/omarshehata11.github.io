@@ -137,9 +137,19 @@ IO_CSQ_COMPLETE_CANCELED_IRP CsqCompleteCanceledIrp;
 
 I won't actually use all of those routines, some of it will just not be mandatory for my project. like the CsqAcquireLock and CsqReleaseLock, those are used to just serialize the access to the queue, this case will be helpful if there are many threads trying to access the queue at the same time, but for my driver it's only on thread. and also CsqCompleteCanceledIrp I won't use it for the project, I have to implement it in some way but I don't need to make it do its job.
 
+then I initialized the structure of **IO_CSQ** and the LIST_ENTRY:
+
+```cpp	
+	// Initialzing the Queue and the Cancel-safe Framework functions.
+	InitializeListHead(&lpDeviceExtension->IrpQueueList);
+	IoCsqInitializeEx(&lpDeviceExtension->CancelSafeQueue, CsqInsertIrp, CsqRemoveIrp, CsqPeekNextIrp, CsqAcquireLock, CsqReleaseLock, CsqCompleteCanceledIrp);
+```
+
+Now we need to Implement those routines.. 
+
 ### CsqInsertIrp
 
-Then I implemented the routines, here's the CsqInsertIrp : 
+here's the CsqInsertIrp : 
 
 ```cpp
 	// Get the start of the DevExtension structure
@@ -264,6 +274,94 @@ then get the start of that IRP (using the CONTAINING_RECORD) and return it.
 ### CsqAcquireLock & CsqReleaseLock & CsqCompleteCanceledIrp
 
 And again I didn't used them in my project, you can implement the release and acquire lock using any kind of object that can do so like a mutex.
+
+
+
+## Applying the Inverted Call Model concepts
+
+The general Idea of the example project that I registered for PnP Notification. and when there's a notification came from the PnP manager; the driver needs to notify the user-mode app. 
+
+
+
+### Dequeue the IRP
+
+So I created this callback routine ```UsbDriverCallBackRoutine``` that will be called if there's an event related to what I just registered with the PnP manager. So inside this function we should check if there's any IRP in the Queue, and if found it will dequeue one and complete it. there's a snippet of the function code:
+
+```cpp
+	if (IsListEmpty(&lpDeviceExtension->IrpQueueList))
+	{
+		KdPrint(("The Queue is empty, Can't dequeue any."));
+		return STATUS_UNSUCCESSFUL;
+	}
+
+	PIRP Irp = IoCsqRemoveNextIrp(&lpDeviceExtension->CancelSafeQueue, nullptr);
+
+	if (Irp == NULL)
+	{ 
+		KdPrint(("Error: Can't get the Irp from the Queue. Queue seems to be empty")); 
+		return STATUS_UNSUCCESSFUL;
+	}
+
+	KdPrint(("SUCCESS: the Irp now pulled from the queue."));
+```
+
+So after checking  if the event matches what we are looking for, I checked if the list is empty, and if not I will call ```IoCsqRemoveNextIrp``` to remove the next IRP without any PeekContext passed. Now after I popped it out from the queue, I need to complete it :
+
+```cpp
+	Irp->IoStatus.Status = STATUS_SUCCESS;
+	Irp->IoStatus.Information = 0;
+
+	IoCompleteRequest(Irp, IO_NO_INCREMENT);
+
+	return STATUS_SUCCESS;
+```
+
+
+
+### Push the IRP to the Queue
+
+When we need to Push an IRP to the Queue ? when we firstly accept it right. So when the ring 3 app call the ```DeviceIoControl()``` with our IOCTL code, the I/O manager will send to us an IRP. So inside the Dispatch routine that will accept that request ( You should set this function here ```DriverObject->MajorFunction[IRP_MJ_DEVICE_CONTROL]```) we should push the incoming IRP to the queue and change its status to pending state, like so :
+
+```cpp
+	switch (StackLoc->Parameters.DeviceIoControl.IoControlCode)
+	{
+	case IOCTL_MY_SOUND:
+		KdPrint(("Catched a new incoming IRP. Queuing it."));
+		KdPrint(("is the list is empty: %d", IsListEmpty(&lpDeviceExtension->IrpQueueList)));
+
+		// push the Irp to the queue
+		status = IoCsqInsertIrpEx(&lpDeviceExtension->CancelSafeQueue, Irp, nullptr, nullptr);
+
+		if (!NT_SUCCESS(status))
+		{
+			KdPrint(("Error: can't push the Irp to the queue."));
+			break;
+		}
+	
+		// Everything is well..
+		KdPrint(("SUCCESS: the Irp now pushed to the queue."));
+
+
+		// Increment the number of Irps.
+		lpDeviceExtension->nuOfQueuedIrps++;
+
+
+		KdPrint((" Number of Irps in the queue : %i.", lpDeviceExtension->nuOfQueuedIrps));
+		KdPrint(("is the list is empty: %d", IsListEmpty(&lpDeviceExtension->IrpQueueList)));
+
+		status = STATUS_SUCCESS;
+
+		break;
+	}
+
+	Irp->IoStatus.Status = STATUS_PENDING;
+
+	status = STATUS_PENDING;
+
+	return status;
+```
+
+So I checked the incoming IOCTL code, and if it matches our; then I called ```IoCsqInsertIrpEx``` to push it to the queue, and finally in the last part I changed its status to ```STATUS_PENDING``` and returned that status.
 
 
 
