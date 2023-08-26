@@ -267,13 +267,13 @@ And again I didn't used them in my project, you can implement the release and ac
 
 
 
-## Conclusion
+# Conclusion
 
 You can talk to ring 3 apps from kernel driver to notify it about an event or anything from kernel prospective using the Inverted Call Model, and its idea is to Park or queue an IRP from the user and when you want to notify the user you will complete one of queued IRPs. And to do your job on the queue things you need to use the Cancel-safe framework to make it more manageable for you.
 
 
 
-## Note Resources
+# Note Resources
 
 In this section I want to suggest some good resource to get start learning about kernel mode drivers which is really so much fun topic to learn, and it will help you to understand what's behind the scenes for those guys who love deep understand and knowledge
 
