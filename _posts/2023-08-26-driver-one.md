@@ -1,5 +1,5 @@
 ---
-title: "Inverted Calls & Cancel-safe Framework"
+title: "Inverted Call Model & Cancel-safe Framework"
 classes: wide
 tags: [WDM]
 header:
