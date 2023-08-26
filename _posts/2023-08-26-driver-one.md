@@ -167,7 +167,7 @@ Then I implemented the routines, here's the CsqInsertIrp :
 
 The general Idea of it is to insert the IRP to the queue, and according to the parameters passed to the routines I used ```CONTAINING_RECORD``` macro to get the start of my *DeviceExtension* structure then used that info to push the IRP to the queue
 
-> - You can see the Implementation of the *DeviceExtension* structure in the header file; this structure is very important for every kernel driver to hold it's data and info about the kernel in general case.
+> - You can see the Implementation of the *DeviceExtension* structure in the header file; this structure is very important for every kernel driver to hold it's data and info about the driver in general case.
 > - As said before you can implement the structure of the queue as you want, I implemented it as a doubly linked list (LIST_ENTRY). This [Article](https://www.osronline.com/article.cfm%5Earticle=499.htm) from again OSR is perfectly explaining the LIST_ENTRY structure.
 
 
@@ -252,8 +252,8 @@ And here comes the boss of the routines (in my opinion), This is its implementat
 
 The basic idea of this routine is to return the next IRP that it found it suitable, and what's meant by "suitable" that it matches the peekcontext it searches for; that given by the caller. But if there's no context that it's searches for (like in my case), it will just return the next IRP it founds in the queue. So I got the *DeviceExtension* structure first, then I checked if the list is empty or not, and if not then I have two choices
 
-- there's an IRP passed to me at first, then I will get the forward pointer of the LIST_ENTRY structure of the IRP 
-- and if there's not passed IRP, then I choose the IRP just after the LIST_ENTRY head
+- there's an IRP passed to me at first, then I will get the forward pointer of the LIST_ENTRY structure of the that IRP (that points to the next IRP) 
+- and if there's IRP passed, then I choose the IRP just after the LIST_ENTRY head
 
 then get the start of that IRP (using the CONTAINING_RECORD) and return it.
 
@@ -280,7 +280,7 @@ In this section I want to suggest some good resource to get start learning about
 - ***Windows internals 1 & 2 & 3 for pavel in pluralsight*** : I can say that's it's one of the best courses I have ever studied. So much knowledge was very talented and professional instructor.
 - ***Programming the Microsoft Windows Driver Model 2nd edition for Walter Oney***: this book is a big reference for you to get start getting deep on WDM driver model programming, it has a lot of knowledge from a senior kernel driver developer and it helped me a lot in this project.
 - ***OSR online***: this website has a lot of articles that interested only in windows driver development. and for both models KMDF and WDM.
-- and of course we can't forget ***Windows Documentation***: we all don't like to read long boring documentation, but this one is different, really I learned a lot from it and it's explained in a very good way that it will make you obsessed with it.
+- and of course we can't forget ***Windows Documentation***: we all don't like reading long boring documentation, but this one is different, really I learned a lot from it and it's explained in a very good way that it will make you obsessed with it.
 
 thanks for reading all of this boring stuff, and if you have any suggestion for me or a question or anything that may negatively affects my psyche, Please take the step and mail me :).
 
