@@ -11,7 +11,7 @@ main:
   - title: "All Categories"
     url: /categories
   - title: "CTF"
-    url: /ctf
+    url: /categories/#ctf
 
   # - title: "Sample Posts"
   #   url: /year-archive/
