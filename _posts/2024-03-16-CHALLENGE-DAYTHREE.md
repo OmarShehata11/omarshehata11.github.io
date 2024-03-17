@@ -32,7 +32,7 @@ DAY 3 FROM ***#100DayOfReverseEngineering***.
 >
 > Good luck!
 
-This is the notes comes with the game. When we start the game it appeared as so : 
+This is the note comes with the game. When we start the game it appeared as so : 
 
 [![?](/assets/images/100Day/pixel/1.png)](/assets/images/100Day/pixel/1.png)
 
