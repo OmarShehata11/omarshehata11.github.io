@@ -17,7 +17,7 @@ ribbon: red
 
 DAY 4 FROM ***#100DayOfReverseEngineering***. 
 
-> Is it better to have  passion, or responsibility ?
+> What's your definition of hard working ?
 
 
 ## Day 4 hadith 
