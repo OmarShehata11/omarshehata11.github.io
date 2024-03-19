@@ -43,6 +43,8 @@ since it's uses % 22, so the output will be ranged from 0 to 22 as max, And it u
 
 it uses the same random number as an index to access my input, and a counter to access another array. This array is an array of pointer, that holds 22 entry each a pointer to memory that (this array holds only 15 unique pointer). Those pointers points to a strings that holds only spaces with different length. 
 
+[![?](/assets/images/100Day/day4/3.png)](/assets/images/100Day/day4/3.png)
+
 It will check the value from my input using the random generated number as an index, to the length of the string that's hold by ```xflag``` array using the counter as an index. 
 
 So now we can reverse the process since we know how it do the check. For that I wrote this script that's going to automate this for us : 
@@ -102,7 +104,7 @@ For every address in this array, I'm going to get the content of it by reading a
 
 Now we got all the needed data, So let's get into the real work. In the main loop I just did as the challenge app did, but instead of comparing the result I'm going to store it, and print the flag. 
 
-[![?](/assets/images/100Day/day4/3.png)](/assets/images/100Day/day4/3.png)
+[![?](/assets/images/100Day/day4/4.png)](/assets/images/100Day/day4/4.png)
 
 
 
