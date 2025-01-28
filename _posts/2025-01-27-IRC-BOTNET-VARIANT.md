@@ -72,7 +72,7 @@ It generate the key within a loop using some local values and the .cab file name
 
 
 
-[![3](/assets/images/malware-analysis/botnet-variant3.png)](/assets/images/malware-analysis/botnet-variant/3.png)
+[![3](/assets/images/malware-analysis/botnet-variant/3.png)](/assets/images/malware-analysis/botnet-variant/3.png)
 
 
 
