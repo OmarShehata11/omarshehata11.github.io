@@ -1,3 +1,18 @@
+---
+title: "IRC_Botnet Variant Torjan deep analysis"
+classes: wide
+tags: [BOTNET]
+header:
+    teaser: /assets/images/myIcon/background_botnet.jpg
+description: "In this article, I'm going to do deep analysis on this botnet variant that's still active in the wild"
+categories:
+  - Malware Analysis
+toc: true
+ribbon: DodgerBlue
+---
+
+
+
 # IRC_Botnet Variant Torjan
 
 The malware sample is a variant for IRC_BOTNET family, it loads through NSIS  installer, has a many malicious techniques from clipboard hijacking, worm functionalities, and botnet ...etc.
@@ -39,7 +54,8 @@ Inside the ```DllMain()``` function, it calls a function using the ```atexit()``
 
 
 
-[image 1]
+[![1](/assets/images/malware-analysis/botnet-variant/1.png)](/assets/images/malware-analysis/botnet-variant/1.png)
+
 
 
 
@@ -47,7 +63,8 @@ Inside the ```DllMain()``` function, it calls a function using the ```atexit()``
 
 
 
-[image 2]
+[![2](/assets/images/malware-analysis/botnet-variant/2.png)](/assets/images/malware-analysis/botnet-variant/2.png)
+
 
 
 
@@ -55,7 +72,8 @@ It generate the key within a loop using some local values and the .cab file name
 
 
 
-[image 3]
+[![3](/assets/images/malware-analysis/botnet-variant3.png)](/assets/images/malware-analysis/botnet-variant/3.png)
+
 
 
 
@@ -69,7 +87,7 @@ the decryption process used by this malware has three phases
 
    
 
-[some image heereee]
+[![30](/assets/images/malware-analysis/botnet-variant/30.png)](/assets/images/malware-analysis/botnet-variant/30.png)
 
 
 
@@ -77,7 +95,8 @@ and this is the code of decrypting the API list :
 
 
 
-[image 4]
+[![4](/assets/images/malware-analysis/botnet-variant/4.png)](/assets/images/malware-analysis/botnet-variant/4.png)
+
 
 
 
@@ -85,7 +104,8 @@ and for decrypting the rest of the file :
 
 
 
-[image 5]
+[![5](/assets/images/malware-analysis/botnet-variant/5.png)](/assets/images/malware-analysis/botnet-variant/5.png)
+
 
 
 
@@ -246,11 +266,14 @@ The DLL then create a process of itself in suspend state, then it empty the data
 
 
 
-[image 6]
+[![6](/assets/images/malware-analysis/botnet-variant/6.png)](/assets/images/malware-analysis/botnet-variant/6.png)
 
-[image 7]
 
-[image 8]
+[![7](/assets/images/malware-analysis/botnet-variant/7.png)](/assets/images/malware-analysis/botnet-variant/7.png)
+
+
+[![8](/assets/images/malware-analysis/botnet-variant/8.png)](/assets/images/malware-analysis/botnet-variant/8.png)
+
 
 
 
@@ -258,7 +281,8 @@ So just before it resumes the thread, I get to the memory map of that process an
 
 > Note: you may face a problem when you load the DLL directly into the debugger, so instead load the installer itself into the debugger and set a breakpoint on loading DLLs:
 >
-> [image 9]
+> [![9](/assets/images/malware-analysis/botnet-variant/9.png)](/assets/images/malware-analysis/botnet-variant/9.png)
+
 
 > Another note: you can find that the malware resolves the APIs from the encrypted .cab file from an array, so I wrote this just simple script to give it the index used to get the API in the code and it will give you that string:
 > ```cpp
@@ -326,7 +350,8 @@ The payload first checks if there's a VM running by checking some strings like "
 
 
 
-[image 9]
+[![10](/assets/images/malware-analysis/botnet-variant/10.png)](/assets/images/malware-analysis/botnet-variant/10png)
+
 
 
 
@@ -338,9 +363,11 @@ The malware achieves that by installing itself under the ``` %windir%, %userprof
 
 
 
-[image 10]
+[![11](/assets/images/malware-analysis/botnet-variant/11.png)](/assets/images/malware-analysis/botnet-variant/11.png)
 
-[image 11]
+
+[![12](/assets/images/malware-analysis/botnet-variant/12.png)](/assets/images/malware-analysis/botnet-variant/12.png)
+
 
 
 
@@ -352,9 +379,11 @@ The malware applies many technique to make itself legitimate, from naming itself
 
 
 
-[image 12]
+[![13](/assets/images/malware-analysis/botnet-variant/13.png)](/assets/images/malware-analysis/botnet-variant/13.png)
 
-[image 13]
+
+[![14](/assets/images/malware-analysis/botnet-variant/14.png)](/assets/images/malware-analysis/botnet-variant/14.png)
+
 
 
 
@@ -368,11 +397,13 @@ the malware runs 4 threads in the background, every one to do a specific job:
 
 The malware enters an infinity loop while checking if there's any device connected that's type 2 or 4 (DRIVER_REMOABLE and DRIVER_REMOTE), and if so it will check if it's not has a symbolic link of A or B (just the named used before for floppy disks), then it will spread it self across it.
 
-[image 14]
+[![15](/assets/images/malware-analysis/botnet-variant/15.png)](/assets/images/malware-analysis/botnet-variant/15.png)
+
 
 It spreads itself by 2 ways, one is old and one that can be run today. The first by creating an ```autorun.inf``` file and a ```script.vbs``` file, in the old versions of windows, when the USB enters the computer the autorun file inside it will run, so it puts a script in that .inf file to run the .vbs code, and the vbs code just run the malware that was copied in that USB ( the script of the vbs or .inf file is mentioned inside the binary itself).
 
-[image 15]
+[![16](/assets/images/malware-analysis/botnet-variant/16.png)](/assets/images/malware-analysis/botnet-variant/16.png)
+
 
 
 
@@ -383,7 +414,8 @@ It spreads itself by 2 ways, one is old and one that can be run today. The first
 
 and if this way couldn't work, it will generate a ```.lnk``` file using the COM object to make this file points to the malware itself, so when the user run this file he will actually run the malware code.
 
-[image 16]
+[![17](/assets/images/malware-analysis/botnet-variant/17.png)](/assets/images/malware-analysis/botnet-variant/17.png)
+
 
 
 
@@ -395,11 +427,14 @@ and at the last, it will try to remove any other file in the USB that may confli
 
 this thread also do a worm functionality by replacing every ```.zip, .rar or .exe``` file inside the **Web Hosting** Directories that may exist (if it's running on a web server). For the .exe file, it removes the whole file and replace it with a copy of the malware with putting some random bytes at the end of the file to change the hash of it. And for .zip or .rar files, it tries to replace the data with a malicious one (with also try to not corrupt the format by putting a correct CRC32 checksum and header and so) and finaly putting them under the name of ```"README.txt.scr"``` (which can be executed normally as a normal executable file).
 
-[image 17]
+[![18](/assets/images/malware-analysis/botnet-variant/18.png)](/assets/images/malware-analysis/botnet-variant/18.png)
 
-[image 18]
 
-[image 19]
+[![19](/assets/images/malware-analysis/botnet-variant/19.png)](/assets/images/malware-analysis/botnet-variant/19.png)
+
+
+[![20](/assets/images/malware-analysis/botnet-variant/20.png)](/assets/images/malware-analysis/botnet-variant/20.png)
+
 
 > so if this is done correctly and the web was infected, every one trying to install any archieve or exe from the web is going to download the malware
 
@@ -411,9 +446,9 @@ In this thread, the malware do the clipboard hijacking by simply trying to get a
 
 
 
-[image 20]
+[![21](/assets/images/malware-analysis/botnet-variant/21.png)](/assets/images/malware-analysis/botnet-variant/21.png)
 
-[image 21]
+[![22](/assets/images/malware-analysis/botnet-variant/22.png)](/assets/images/malware-analysis/botnet-variant/22.png)
 
 
 
@@ -429,7 +464,7 @@ those are instructions that are used in IRC protocol, you can find details about
 
 
 
-[image 22]
+[![23](/assets/images/malware-analysis/botnet-variant/23.png)](/assets/images/malware-analysis/botnet-variant/23.png)
 
 
 
@@ -437,7 +472,7 @@ It starts first by sending the instruction NICK to change it's nick name on the 
 
 
 
-[image 23]
+[![24](/assets/images/malware-analysis/botnet-variant/24.png)](/assets/images/malware-analysis/botnet-variant/24.png)
 
 
 
@@ -445,7 +480,7 @@ After so it tries to receive any data that is sent, then it will going to sperat
 
 
 
-[image 24]
+[![25](/assets/images/malware-analysis/botnet-variant/25.png)](/assets/images/malware-analysis/botnet-variant/25.png)
 
 
 
@@ -453,7 +488,7 @@ Lastly it does another check if no option inside this function achieved, by chec
 
 
 
-[image 25]
+[![26](/assets/images/malware-analysis/botnet-variant/26.png)](/assets/images/malware-analysis/botnet-variant/26.png)
 
 
 
@@ -461,7 +496,7 @@ Further checking also done in the ```mw_execute_recieved_commands()``` function 
 
 
 
-[image 26]
+[![27](/assets/images/malware-analysis/botnet-variant/27.png)](/assets/images/malware-analysis/botnet-variant/27.png)
 
 
 
@@ -469,7 +504,7 @@ Also if he sent the command ```d```, it do a decryption twice with the data afte
 
 
 
-[image 27]
+[![28](/assets/images/malware-analysis/botnet-variant/28.png)](/assets/images/malware-analysis/botnet-variant/28.png)
 
 
 
@@ -477,7 +512,7 @@ and using other user agent : ```Mozilla/5.0 (Windows NT 6.1; WOW64; rv:22.0) Gec
 
 
 
-[image 28]
+[![29](/assets/images/malware-analysis/botnet-variant/29.png)](/assets/images/malware-analysis/botnet-variant/29.png)
 
 
 
