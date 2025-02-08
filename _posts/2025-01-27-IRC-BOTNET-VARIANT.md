@@ -371,7 +371,7 @@ The malware achieves that by installing itself under the ``` %windir%, %userprof
 
 
 
-### AV-Evade
+## AV-Evade
 
 The malware applies many technique to make itself legitimate, from naming itself as winmgr, through putting itself into the authorized apps in the firewall policy in the registry, and also disabling the win defender and removing its zone.identifier ADS.
 
@@ -389,7 +389,7 @@ The malware applies many technique to make itself legitimate, from naming itself
 
 And the malware makes sure that's its running under the Temp path by create a process of it from there.
 
-### Threads Actions:
+## Threads Actions:
 
 the malware runs 4 threads in the background, every one to do a specific job:
 
