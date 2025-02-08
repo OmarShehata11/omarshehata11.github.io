@@ -19,7 +19,7 @@ The malware sample is a variant for IRC_BOTNET family, it loads through NSIS  in
 
 
 
-## Malware Details
+# Malware Details
 
 > sha256: 75d4e24d52a18ef64488fe77b0f6b713ce4b1a484156a344f5cc84fce68e7512
 >
@@ -29,7 +29,7 @@ The malware sample is a variant for IRC_BOTNET family, it loads through NSIS  in
 
 
 
-## Technical summary
+# Technical summary
 
 1. the malware uses NSIS installer to install itself, the malware firstly consists of 1 DLL (called supersonics.dll) and a cab file (called Blindworm.cab). The cab file has the key and some APIs that the DLL going to import dynamically and the payload itself all encrypted, the whole file is encrypted through a key that the DLL will resolve dynamically according to the cab file name, then after this decryption it well use the key that was decrypted from the cab to again decrypt the rest of the file (APIs, and Payload).
 2. the DLL uses some anti-analysis techniques like mouse cursor check and CPU tick count, and also it identifies many useless variables and call many functions that has no affect on the actual functionality, also it resolves all its APIs dynamically.
@@ -42,9 +42,9 @@ The malware sample is a variant for IRC_BOTNET family, it loads through NSIS  in
 
 
 
-## Deep Analysis
+# Deep Analysis
 
-### 1- Unpacker
+## 1- Unpacker
 
 First of all, when the malware is installed through the NSIS installer to hide itself, when I decompressed it using 7zip, I found 2 interested files (the Blindworm.cab and supersonics.dll) and a normal system.dll that has no malicious functionality.
 
@@ -344,7 +344,7 @@ So just before it resumes the thread, I get to the memory map of that process an
 
 
 
-### 2- Analyzing the payload
+## 2- Analyzing the payload
 
 The payload first checks if there's a VM running by checking some strings like "vm" or so, and if found, it will create a .bat file that holds a script for self deletion. The malware also uses a mutex to make it only run once in the system, the mutex name is "b4".
 
@@ -357,7 +357,7 @@ The payload first checks if there's a VM running by checking some strings like "
 
 > Note: the malware do many API hammering by calling many APIs in useless way
 
-### Persistance
+## Persistance
 
 The malware achieves that by installing itself under the ``` %windir%, %userprofile%, %temp%``` directory, by making a directory called ``` M-505072972047509246024758274085628272046520``` and install itself under this with the name of ```winmgr.exe``` to look legitimate  (and for some reasons, the M-505072972047509246024758274085628272046520 directory is hidden and can't be shown in the directory browser or even cmd). Also it install itself under the ```SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run\\``` registry key.
 
@@ -371,7 +371,7 @@ The malware achieves that by installing itself under the ``` %windir%, %userprof
 
 
 
-#### AV-Evade
+### AV-Evade
 
 The malware applies many technique to make itself legitimate, from naming itself as winmgr, through putting itself into the authorized apps in the firewall policy in the registry, and also disabling the win defender and removing its zone.identifier ADS.
 
@@ -389,11 +389,11 @@ The malware applies many technique to make itself legitimate, from naming itself
 
 And the malware makes sure that's its running under the Temp path by create a process of it from there.
 
-#### Threads Actions:
+### Threads Actions:
 
 the malware runs 4 threads in the background, every one to do a specific job:
 
-##### THREAD 1: Worm Functionality across USB and Network Drivers
+#### THREAD 1: Worm Functionality across USB and Network Drivers
 
 The malware enters an infinity loop while checking if there's any device connected that's type 2 or 4 (DRIVER_REMOABLE and DRIVER_REMOTE), and if so it will check if it's not has a symbolic link of A or B (just the named used before for floppy disks), then it will spread it self across it.
 
@@ -423,7 +423,7 @@ and at the last, it will try to remove any other file in the USB that may confli
 
 
 
-##### THREAD 2: Web Hosting Files Infection
+#### THREAD 2: Web Hosting Files Infection
 
 this thread also do a worm functionality by replacing every ```.zip, .rar or .exe``` file inside the **Web Hosting** Directories that may exist (if it's running on a web server). For the .exe file, it removes the whole file and replace it with a copy of the malware with putting some random bytes at the end of the file to change the hash of it. And for .zip or .rar files, it tries to replace the data with a malicious one (with also try to not corrupt the format by putting a correct CRC32 checksum and header and so) and finaly putting them under the name of ```"README.txt.scr"``` (which can be executed normally as a normal executable file).
 
@@ -440,7 +440,7 @@ this thread also do a worm functionality by replacing every ```.zip, .rar or .ex
 
 
 
-##### THREAD 3: Clipboard Hijacking
+#### THREAD 3: Clipboard Hijacking
 
 In this thread, the malware do the clipboard hijacking by simply trying to get a handle to the clipboard, and if it found any possibility that it contains an address to a cryptocurrency wallet, then it will replace it with an address of the malware author itself according  of course to the type of cryptocurrency that wallet holds.
 
@@ -452,7 +452,7 @@ In this thread, the malware do the clipboard hijacking by simply trying to get a
 
 
 
-##### THREAD 4: C2C Operations
+#### THREAD 4: C2C Operations
 
 This thread is responsible for any Command and Control actions, from connecting to the malware author, through sending the messages and receiving it.
 
@@ -516,7 +516,7 @@ and using other user agent : ```Mozilla/5.0 (Windows NT 6.1; WOW64; rv:22.0) Gec
 
 
 
-### IOCs
+## IOCs
 
 | IOC Type   | Indicator                                                    |
 | ---------- | ------------------------------------------------------------ |
@@ -528,7 +528,7 @@ and using other user agent : ```Mozilla/5.0 (Windows NT 6.1; WOW64; rv:22.0) Gec
 | IP         | 220.181.87.80                                                |
 | IP:Port    | 220.181.87.80:5050                                           |
 
-## Summary 
+# Summary 
 
 this IRC botnet variant do a lot of old and new techniques that still working right now in the wild, from hiding itself inside an encrypted file and installer, through spreading itself across the whole system using some worm techniques, and some other techniques like clipboard hijacking and anti-vm and other, to lastly communication with the C&C using the IRC protocol to send info about the system or even install other malwares.
 
