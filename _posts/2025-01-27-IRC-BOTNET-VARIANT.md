@@ -528,6 +528,114 @@ and using other user agent : ```Mozilla/5.0 (Windows NT 6.1; WOW64; rv:22.0) Gec
 | IP         | 220.181.87.80                                                |
 | IP:Port    | 220.181.87.80:5050                                           |
 
+
+# YARA rule
+
+```yara
+import "pe"
+
+rule irc_boot_var {
+	meta:
+		author = "0xefe4"
+		description = "yara rule for irc botnet variant"
+		sample = "https://omarshehata11.github.io/malware%20analysis/IRC-BOTNET-VARIANT/"
+		date = "2025-04-03"
+		yarahub_uuid = "b128dcb5-a430-4bf8-bb14-77b9c41ac16c"
+		yarahub_license = "CC0 1.0"
+		yarahub_rule_sharing_tlp = "TLP:WHITE"
+		yarahub_reference_md5 = "0b089978de701f3953689fa3ac98cd76"
+
+	strings:
+		// temp file name (very specific)
+		$tempFileName = "M-505072972047509246024758274085628272046520" nocase ascii wide
+	
+		// path/file indicators 
+		$s1 = "%windir%" ascii wide nocase
+		$s2 = "%userprofile%" ascii wide nocase
+		$s3 = "%temp%" ascii wide nocase
+		$s4 = ".exe" ascii wide nocase
+		$s5 = ".zip" ascii wide nocase
+		$s6 = ".rar" ascii wide nocase
+
+		// wallet addresses
+		$w1 = "1of6uEzx5qfStF1HrVXaZ1eE3X4ntnbsx"
+		$w2 = "t1JQVnfzuqRWWAaYgvpXT4PzZzo2M3scQja"
+		$w3 = "LMimQj9RBdYbDTsV6k37TneN2Svi4e1PXF"
+		$w4 = "4BrL51JCc9NGQ71kWhnYoDRffsDZy7m1HUU7MRU4nUMXAHNFBEJhkTZV9HdaL4gfuNBxLPc3BeMkLGaPbF5vWtANQni58KYZqH43YSDeqY"
+		$w5 = "DHDUtYKHtEU9w9Scyan47L2YhKiVqhpXxH"
+		$w6 = "B5f1bkbcmXzwZtL5ua5HYFHKxFz3HFcNi8"
+		$w7 = "EcqcbRssS5tMx1WKAVeT2KUcFWaWueywoz"
+		$w8 = "PRXRECu2m4gXtYFYPDpVAmYr5qM4u6UECk"
+
+		// network signatures 
+		$n_ua = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:22.0) Gecko/20100101 Firefox/22.0"
+		$n_url = "http://api.wipmania.com/"
+		$n_ip = "220.181.87.80"
+		$n_ip_p = "220.181.87.80:5050"
+
+		// IRC indicators
+		$irc1 = "#ADMIN"
+		$irc2 = "#USER"
+		$irc3 = "#X64"
+		$irc_msg_format = "%s %s \"\" \"x\" :%s\r\n"
+
+
+		// code patter for time stamp signature 
+		  			/*	
+		  				*a2 = SystemTime.wDay | (32 * SystemTime.wMonth) | ((SystemTime.wYear - 1980) << 9);
+						  result = a1;
+						  *a1 = (SystemTime.wSecond / 2) | (32 * SystemTime.wMinute) | (SystemTime.wHour << 11);
+						  return result;
+						
+						  ASSEMBLY CODE
+						.text:00845B0B 0B CA                                or      ecx, edx
+						.text:00845B0D 0F B7 45 F6 (??)                     movzx   eax, [ebp+SystemTime.wDay]
+						.text:00845B11 0B C8                                or      ecx, eax
+						.text:00845B13 8B 55 0C   (??)                      mov     edx, [ebp+arg_4]
+						.text:00845B16 66 89 0A                             mov     [edx], cx
+						.text:00845B19 0F B7 4D F8   (??)                   movzx   ecx, [ebp+SystemTime.wHour]
+						.text:00845B1D C1 E1 0B                             shl     ecx, 0Bh
+						.text:00845B20 0F B7 55 FA     (??)                 movzx   edx, [ebp+SystemTime.wMinute]
+						.text:00845B24 C1 E2 05                             shl     edx, 5
+						.text:00845B27 0B CA                                or      ecx, edx
+						.text:00845B29 0F B7 45 FC   (??)                   movzx   eax, [ebp+SystemTime.wSecond]
+						.text:00845B2D 99                                   cdq
+						.text:00845B2E 2B C2                                sub     eax, edx
+						.text:00845B30 D1 F8                                sar     eax, 1
+						.text:00845B32 0B C8                                or      ecx, eax
+						.text:00845B34 8B 45 08      (??)                   mov     eax, [ebp+arg_0]
+						.text:00845B37 66 89 08                             mov     [eax], cx
+					*/
+
+		$code_time = {
+		0B CA 0F B7 45 ?? 0B C8 8B 55 ?? 66 89 0A 0F B7 4D ?? C1 E1 0B 0F B7 55 ?? 
+		C1 E2 05 0B CA 0F B7 45 ?? 99 2B C2 D1 F8 0B C8 8B 45 ?? 66 89 08
+		 }
+
+
+
+	condition:
+		uint16(0) == 0x5a4d and
+		filesize < 150KB and
+		(
+			(any of ($w*) and (any of ($n_*))) or 
+			
+			($tempFileName and any of ($s*)) or 
+			
+			($tempFileName) or 
+
+			(2 of ($w*)) or 
+			
+			(2 of ($n_*)) or 
+
+			(2 of ($irc*) and any of ($n_*)) or 
+
+			$code_time
+		) 
+}
+```
+
+
 # Summary 
 
 this IRC botnet variant do a lot of old and new techniques that still working right now in the wild, from hiding itself inside an encrypted file and installer, through spreading itself across the whole system using some worm techniques, and some other techniques like clipboard hijacking and anti-vm and other, to lastly communication with the C&C using the IRC protocol to send info about the system or even install other malwares.
