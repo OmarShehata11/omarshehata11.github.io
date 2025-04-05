@@ -531,7 +531,7 @@ and using other user agent : ```Mozilla/5.0 (Windows NT 6.1; WOW64; rv:22.0) Gec
 
 # YARA rule
 
-```yara
+```c
 import "pe"
 
 rule irc_boot_var {
