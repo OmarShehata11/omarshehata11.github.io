@@ -40,7 +40,7 @@ This rootkit is build as a legacy filter kernel driver, which is the old way of 
 
 It starts with checking the name of the file that's the target of the operation, and if it same as the rootkit file path it will prevent it. 
 
-You may check the member of the IRP object that's access from [Here ](https://www.vergiliusproject.com/kernels/x86/windows-xp/sp3/IRP)  from [vergiliusproject](https://www.vergiliusproject.com/) because it uses an old version of the object (it access the IO_STACK_LOCATION, then FILE_OBJECT, then the UNICODE_STRING of the file name).
+You may check the member of the IRP object that's access from [Here](https://www.vergiliusproject.com/kernels/x86/windows-xp/sp3/_IRP) from [vergiliusproject](https://www.vergiliusproject.com/) because it uses an old version of the object (it access the IO_STACK_LOCATION, then FILE_OBJECT, then the UNICODE_STRING of the file name).
 
 As shown in the code:
 
