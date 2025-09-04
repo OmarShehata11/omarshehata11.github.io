@@ -3,7 +3,7 @@ title: "CopperStealer Rootkit deep analysis"
 classes: wide
 tags: [ROOTKIT]
 header:
-    teaser: /assets/images/myIcon/copperavatar.png
+    teaser: /assets/images/myIcon/copperavater.png
 description: "In this article, I'm going to do a deep analysis on rootkit that was droped from CopperStealer Malware"
 categories:
   - Malware Analysis
